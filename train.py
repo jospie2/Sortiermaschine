@@ -50,7 +50,7 @@ def get_points(image, blob_contour):
         return [image, values_at_points]
 color: str = ""
 for color_pointer in range(0,3):
-    color_pointer = 2
+    #color_pointer = 2
     print(color_pointer)
     match color_pointer:
         case 0:
@@ -71,7 +71,22 @@ for color_pointer in range(0,3):
 
 
         frame = cv2.imread(path + image_name)[crop[0]:crop[1], crop[2]:crop[3]]
-        values = image_processing.magic(empty_image, frame, crop = crop, show_option= 1)
+        frame_c = frame
+        # Bild verarbeiten
+        gray_image = cv2.cvtColor(frame_c, cv2.COLOR_BGR2GRAY)
+        close_to_black_mask = gray_image < 70
+        lab_image = cv2.cvtColor(frame_c, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(lab_image)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        cl = clahe.apply(l)
+        enhanced_lab_image = cv2.merge((cl, a, b))
+        frame_c = cv2.cvtColor(enhanced_lab_image, cv2.COLOR_LAB2BGR)
+        alpha = 1.5 # Contrast control (1.0-3.0)
+        beta = 10 # Brightness control (0-100)
+        adjusted = frame_c 
+        # get color values form image
+        values, cords = image_processing.get_data(empty_image, frame_c, adjusted, crop, show_option=0, last_frame=cv2.imread(empty_image)[crop[0]:crop[1], crop[2]:crop[3]])
+            
         print(values)
         #savetxt(color + '.csv', data, delimiter=',')
         existing_data = np.loadtxt(color+ '.csv', delimiter=',', dtype=int)

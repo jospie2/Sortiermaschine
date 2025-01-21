@@ -19,7 +19,7 @@ last_color = ""
 
 # Magazin einrichten
 crop = [300,390, 325,390]
-collect_data_while_sorting = True
+collect_data_while_sorting = False
 feeders_stock = [75,75,75,75]
 wait_time_beteene_feeds = 550
 slide_color_to_position_assignment = {"red": 0, "yellow": 50, "blue": 100}
