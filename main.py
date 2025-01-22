@@ -20,15 +20,22 @@ last_color = ""
 # Magazin einrichten
 crop = [300,390, 325,390]
 collect_data_while_sorting = True
-feeders_stock = [75,75,75,75]
-wait_time_beteene_feeds = 550
+feeders_stock = [20,20,20,20] # [76,76,76,76]
+wait_time_beteene_feeds = 750 # Abstand zwischen Zufuehrungen
 slide_color_to_position_assignment = {"red": 0, "yellow": 50, "blue": 100}
-feeders_delay = {
-    "1": {"0-56": 70, "57-61": 90, "62-76": 150}, 
+"""feeders_delay_gross = {
+    "1": {"0-9": 70, "10-21": 90, "62-76": 150}, 
     "2": {"0-50": 70, "51-66": 120, "67-76": 140}, 
     "3": {"0-42": 70, "43-52": 95, "53-60": 110, "61-67": 115, "68-73": 125, "74-76": 130 }, 
     "4": {"0-59": 70, "60-64": 90, "65-71": 115, "71-76": 130}, 
+}"""
+feeders_delay = {
+    "1": {"0-5": 120, "6-12": 130, "13-21": 140}, 
+    "2": {"0-9": 150, "10-21": 170}, 
+    "3": {"0-7": 150, "8-10": 160, "11-21": 180}, 
+    "4": {"0-6": 130, "7-17": 150, "18-21": 160}, 
 }
+
 
 delays_for_slide_zones = {"15-30": 100, "31-76": 70, "77-100": 50, "101-139": 20}
 
@@ -75,13 +82,14 @@ def handel_feeders():
     if feeder_running:
         if feed_time.time_up() :
             ranges = [x.split("-") for x in feeders_delay[str(current_feeder)]]
-            current_lego = 75 - feeders_stock[current_feeder-1]
+            current_lego = 20 - feeders_stock[current_feeder-1]
             #print("lego:", current_lego, feeders_stock[current_feeder-1], current_feeder)
             for range_values in ranges:
                 start, end = [int(x) for x in range_values]
+                print(start,end,current_lego)
                 if start <= current_lego <= end:
                     delay_time = feeders_delay[str(current_feeder)][str(start) + "-" + str(end)]
-                    #print("delay:",delay_time)
+                    print("delay:",delay_time)
             print("feed")
             driver.feed_it(with_which_one=current_feeder, delay=delay_time)
             feed_time = SetWait(wait_time_beteene_feeds)
@@ -191,7 +199,7 @@ while True:
                 prediction, certainty = process.predict(values)
                 # wenn die erkennung wahrscheinlich richtig ist, dann weiter machen 
                 if certainty < 200 and not last_color == prediction:
-                    save_image(frame_c, prediction)
+                    save_image(frame[crop[0]:crop[1], crop[2]:crop[3]], prediction) # frame_c um bild mit Erkennungmarkierungen zu speichern
                     cv2.imshow("last", frame_c)
 
                     print('\033[94m' + "color: " +  prediction + " certaity: " + str(certainty)  + '\033[0m') 
